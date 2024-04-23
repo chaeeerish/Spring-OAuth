@@ -8,7 +8,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import tave.springsecurity.oauth.jwt.exception.CustomExpiredJwtException;
 import tave.springsecurity.oauth.jwt.exception.CustomJwtException;
-import tave.springsecurity.oauth.member.domain.Member;
 import tave.springsecurity.oauth.member.domain.MemberDto;
 import tave.springsecurity.oauth.member.domain.PrincipalDetail;
 import tave.springsecurity.oauth.member.domain.Role;
