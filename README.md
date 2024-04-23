@@ -11,8 +11,8 @@
 
 ### 카카오 소셜 로그인 흐름도
 https://developers.kakao.com/docs/latest/ko/kakaologin/rest-api
-![img.png](img.png)  
-![img_1.png](img_1.png)  
+![img.png](image/img.png)  
+![img_1.png](image/img_1.png)  
 
 ### 로그인 동작 흐름
 1. 사용자가 요청하면 Spring Security Filter에 등록된 JwtVerifyFilter를 거친다.
@@ -298,8 +298,51 @@ Spring Security 필터 순서는 다음과 같다.
 > JwtVerifyFilter
 
 ---
-### 구현 결과
+### 추가 구현
+**로그인이 완료된다면 해당 서비스의 접근 권한을 가진 JWT 토큰을 발급하도록 수정하였다.**  
+CommonLoginSuccessHandler에서 토큰을 만들 때 principal의 사용자 정보를 이용하여 생성하도록 변경하였다.  
 
+CommonLoginSuccessHandler.java
+```java
+@Slf4j
+public class CommonLoginSuccessHandler implements AuthenticationSuccessHandler {
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        Authentication authentication) throws IOException, ServletException {
+        PrincipalDetail principal = (PrincipalDetail) authentication.getPrincipal();
+
+        log.info("authentication.getPrincipal() = {}", principal);
+
+        Map<String, Object> responseMap = new HashMap<>();
+        responseMap.put("accessToken", JwtUtils.generateToken(principal.getMemberInfo(), JwtConstants.ACCESS_EXP_TIME));
+        responseMap.put("refreshToken", JwtUtils.generateToken(principal.getMemberInfo(), JwtConstants.REFRESH_EXP_TIME));
+
+        Gson gson = new Gson();
+        String json = gson.toJson(responseMap);
+
+        response.setContentType("application/json; charset=UTF-8");
+
+        PrintWriter writer = response.getWriter();
+        writer.println(json);
+        writer.flush();
+    }
+}
+```
+
+---
+### 구현 결과
+1. 브라우저에서 localhost:8081로 진입한다.
+![img_2.png](image/img_2.png)
+2. 카카오 로그인 버튼을 클릭한다.
+3. 카카오 로그인 페이지로 이동된다.
+![img_3.png](image/img_3.png)
+4. 로그인이 완료되면 access_token, refresh_token을 얻게된다.
+![img_4.png](image/img_4.png)
+5. jwt 토큰을 파싱하니 사용자 정보가 담겨있는 것을 확인할 수 있다.
+![img_5.png](image/img_5.png)
+6. 해당 토큰을 이용하여 인증이 필요한 api에 접근한다.
+![img_6.png](image/img_6.png)
 
 ---
 참고 블로그
