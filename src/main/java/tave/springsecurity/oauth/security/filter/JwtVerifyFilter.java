@@ -1,4 +1,4 @@
-package tave.springsecurity.oauth.jwt.filter;
+package tave.springsecurity.oauth.security.filter;
 
 import com.google.gson.Gson;
 import jakarta.servlet.FilterChain;
